@@ -43,6 +43,12 @@ config POWER_RESET_QNAP
 
 	  Say Y if you have a QNAP NAS.
 
+config POWER_RESET_QUATRO
+	bool "CSR Quatro SoC Reset driver"
+	depends on POWER_RESET && ARCH_QUATRO
+	help
+	  restart support for CSR Quatro SoCs.
+
 config POWER_RESET_RESTART
 	bool "Restart power-off driver"
 	depends on ARM

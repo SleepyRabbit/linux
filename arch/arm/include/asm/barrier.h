@@ -40,9 +40,25 @@
 #ifdef CONFIG_ARCH_HAS_BARRIERS
 #include <mach/barriers.h>
 #elif defined(CONFIG_ARM_DMA_MEM_BUFFERABLE) || defined(CONFIG_SMP)
+#ifdef CONFIG_SOC_QUATRO5300
+#define mb()	\
+	do { 	\
+		extern volatile unsigned *barrier_workaround_addr_g, barrier_workaround_val_g;	\
+		dsb(); outer_sync(); \
+		barrier_workaround_val_g = (barrier_workaround_addr_g) ? *barrier_workaround_addr_g : 0;	\
+	} while (0)
+#define rmb()		dsb()
+#define wmb()	\
+	do { 	\
+		extern volatile unsigned *barrier_workaround_addr_g, barrier_workaround_val_g;	\
+		dsb(st); outer_sync(); \
+		barrier_workaround_val_g = (barrier_workaround_addr_g) ? *barrier_workaround_addr_g : 0;	\
+	} while (0)
+#else
 #define mb()		do { dsb(); outer_sync(); } while (0)
 #define rmb()		dsb()
 #define wmb()		do { dsb(st); outer_sync(); } while (0)
+#endif
 #else
 #define mb()		barrier()
 #define rmb()		barrier()

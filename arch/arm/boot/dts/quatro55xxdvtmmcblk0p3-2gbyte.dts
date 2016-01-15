@@ -1,0 +1,36 @@
+#include <dt-bindings/interrupt-controller/irq.h>
+/*
+ * DTS file for CSR 5500 DVT Evaluation Board
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/dts-v1/;
+
+/include/ "quatro5500.dtsi"
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	model = "CSR Quatro 5500 Evaluation Board";
+	compatible = "csr,quatro-5500";
+
+	chosen {
+	       bootargs = "root=/dev/mmcblk0p3 ro rootwait rootfstype=ext4 console=ttyS0,115200n8 earlyprintk=serial,uart0,115200";
+	};
+	/* has 2GB of ram at 0x0 8000 0000
+	*/
+	memory {
+		reg = <0 0x80000000 0 0x80000000 >;
+	};
+};

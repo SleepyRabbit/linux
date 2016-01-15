@@ -1,0 +1,36 @@
+/*
+ * DTS file for CSR 5300 Evaluation Board
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/dts-v1/;
+
+/include/ "quatro5300.dtsi"
+
+/ {
+	model = "CSR Quatro 5300 Evaluation Board";
+	compatible = "csr,quatro-5300";
+
+	chosen {
+	       bootargs = "root=/dev/mtdblock4 rw rootwait console=ttyS0,115200n8 break=y";
+/*	       bootargs = "root=/dev/sda1      rw rootwait console=ttyS0,115200n8 break=y"; */
+	};
+
+	/* has 1Gb of ram at 0, all reserved memory (m4 and
+	   barrier-workaround) is now done via the devicetree reserved
+	   memory facility. */
+	memory {
+		reg = <0x00000000 0x40000000>;
+	};	
+};

@@ -1,0 +1,208 @@
+/* DTS file for CSR Quatro 4500 SMP
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/include/ "skeleton.dtsi"
+/ {
+	compatible = "csr,quatro-4500";
+	interrupt-parent = <&intc>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	aliases {
+		serial0	= &uart0;
+	};
+	
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,arm11mpcore";
+			reg = <0x0>;
+			clock-frequency = <300000000>;
+			timebase-frequency = <300000000>;
+		};
+		//
+		cpu@1 {
+			device_type = "cpu";
+			compatible = "arm,arm11mpcore";
+			reg = <0x100>;
+			clock-frequency = <300000000>;
+			timebase-frequency = <300000000>;
+		};
+		//
+	};
+
+	clocks {
+		/*
+		 * Fixed 24MHz oscillator input to SoC
+		 */
+		CLK_OSCIN: CLK_OSCIN {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <24000000>;
+		};
+
+		CLK_GMAC_PHY: CLK_GMAC_PHY {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <300000000>;
+			clock-output-names = "CLK_GMAC_PHY";
+		};
+	};
+
+	regbus {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0xe0000000 0xe0000000 0x05000000>;
+
+		uart0: serial@e0010010 {
+			compatible = "ns16550a";
+			reg = <0xe0010010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <14>;
+			current-speed = <115200>;
+			clock-frequency = <300000000>;
+			no-loopback-test;
+		};		
+
+		intc: interrupt-controller@e0303000 {
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			compatible = "csr,quatro-intc";
+			reg = <0xe0303000 0x1000>;
+		};
+
+		hrt0@f0004010 {
+			compatible = "csr,quatro-hrt64";
+			reg = <0xe0004010 0x10>;
+		};
+
+		hrt1@f0004020 {
+			compatible = "csr,quatro-hrt32";
+			reg = <0xe0004020 0x0c>;
+		};
+
+		timer0: timer@e000402c {
+			compatible = "csr,quatro-sys-timer";
+			reg = <0xe000402c 0x40>;
+			interrupts = <0 1 2>;
+		};
+
+		rtc: rtc@e0012000 {
+			compatible = "csr,quatro-rtc";
+			reg = <0xe0012000 0x20>;
+			interrupts = <84>;
+		};
+
+		gmac: ethernet@e0016000 {
+			compatible = "csr,quatro-gmac", "snps,dwmac-3.70a";
+			reg = <0xe0016000 0x2000>;
+			interrupts = <104 105>;
+			interrupt-names = "macirq", "eth_wake_irq";  
+			clocks = <&CLK_GMAC_PHY>; 
+			clock-names = "stmmaceth";
+			snps,pbl = <1>;
+		};		
+		lpri0: lpri@e0110000 {
+			compatible = "csr,quatro-lrds";
+			reg = <0xe0110000 0x2000 0xe0115000 0x1000>;
+			interrupts = <32 34 36 38>;
+		};
+
+		gpdma0: gpdma@e0014000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0xe0014000 0x20>;
+			interrupts = <86 87>;
+		};
+
+		gpdma1: gpdma@e0108000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0xe0108000 0x20>;
+			interrupts = <88 89>;
+		};
+
+		jbig0: jbig@e0015000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0xe0015000 0x2000>;
+			interrupts = <16>;
+		};
+
+		jbig1: jbig@e0109000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0xe0109000 0x2000>;
+			interrupts = <17>;
+		};
+
+		huff0: huff@e0580000 {
+			compatible = "csr,quatro-ijac";
+			reg = <0xe0580000 0x100>;
+			interrupts = <28>;
+		};
+
+		sbe0: sbe@e05d0000 {
+			compatible = "csr,quatro-sbe";
+			reg = <0xe05d0000 0x10000>;
+			interrupts = <26>;
+		};
+
+		tcc0: tcc@e05e0000 {
+			compatible = "csr,quatro-tcc";
+			reg = <0xe05e0000 0x20000>;
+			interrupts = <27>;
+		};
+
+		dsp0: dsp@e0600000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xe0404000 0x4 0xe0600000 0x48000>;
+			interrupts = <18 19>;
+		};
+
+		dsp1: dsp@e0680000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xe0404004 0x4 0xe0680000 0x48000>;
+			interrupts = <20 21>;
+		};
+
+		dsp2: dsp@e0700000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xe0404008 0x4 0xe0700000 0x48000>;
+			interrupts = <22 23>;
+		};
+
+		dsp3: dsp@e0780000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xe040400C 0x4 0xe0780000 0x48000>;
+			interrupts = <24 25>;
+		};
+
+		motflex: flexrisc@e0140000 {
+			compatible = "csr,quatro-flexrisc";
+			reg = <0xe0140000 0x40000>;
+			interrupts = <48 49>;
+		};
+
+		scanflex: flexrisc@e01c0000 {
+			compatible = "csr,quatro-flexrisc";
+			reg = <0xe01c0000 0x40000>;
+			interrupts = <55 56>;
+		};
+
+	};
+};
+

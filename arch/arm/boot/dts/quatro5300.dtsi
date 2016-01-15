@@ -1,0 +1,379 @@
+/*
+ * DTS file for CSR Quatro 5300
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/include/ "skeleton.dtsi"
+/ {
+	compatible = "csr,quatro-5300";
+	interrupt-parent = <&intc>;
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	aliases {
+		serial0	= &uart0;
+	};
+	
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,arm11mpcore";
+			reg = <0x0>;
+			clock-frequency = <262500000>;
+			timebase-frequency = <262500000>;
+		};
+	};
+
+	clocks {
+		/*
+		 * Fixed 24MHz oscillator input to SoC
+		 */
+		CLK_OSCIN: CLK_OSCIN {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <24000000>;
+		};
+
+
+		CLK_GMAC_PHY: CLK_GMAC_PHY {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <262500000>;
+			clock-output-names = "CLK_GMAC_PHY";
+		};
+	};
+
+	regbus {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges = <0xF0000000 0xF0000000 0x08000000>;
+
+		uart0: serial@f0037010 {
+			compatible = "ns16550a";
+			reg = <0xf0037010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <15>;
+			current-speed = <115200>;
+			clock-frequency = <262000000>;
+			no-loopback-test;
+		};		
+
+		uart1: serial@0f0044010 {
+			compatible = "ns16550a";
+			reg = <0xf0044010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <16>;
+			current-speed = <115200>;
+			clock-frequency = <262000000>;
+			no-loopback-test;
+		};		
+
+		uart2: serial@f0045010 {
+			compatible = "ns16550a";
+			reg = <0xf0045010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <17>;
+			current-speed = <115200>;
+			clock-frequency = <262000000>;
+			no-loopback-test;
+		};		
+
+		uart3: serial@f0046010 {
+			compatible = "ns16550a";
+			reg = <0xf0046010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <18>;
+			current-speed = <115200>;
+			clock-frequency = <262000000>;
+			no-loopback-test;
+		};		
+
+		uart4: serial@f0047010 {
+			compatible = "ns16550a";
+			reg = <0xf0047010 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <19>;
+			current-speed = <115200>;
+			clock-frequency = <262000000>;
+			no-loopback-test;
+		};		
+
+		intc: interrupt-controller@F0005000 {
+			#interrupt-cells = <1>;
+			interrupt-controller;
+			compatible = "csr,quatro-intc";
+			reg = <0xF0005000 0x1000>;
+		};
+
+		usbd: usbd@0f0010000 {
+			compatible = "csr,quatro-udc";
+			reg = <0xf0010000 0x8000>;
+			interrupts = <7>;
+		};
+
+		usbh: usbh@0f0020000 {
+			compatible = "csr,quatro-ehci","generic-ehci";
+			reg = <0xf0020000 0x8000>;
+			interrupts = <8>;
+		};
+
+		/* spi flash controller
+		*/
+		fcspi@f008b000 {
+			compatible = "csr,fcspi";
+			linux,mtd-name = "physmap-flash.0";
+			reg = <0xf008b000 0x1000>;
+			interrupts = <74>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+			partition@0 {
+				label = "boot";
+				reg = <0x00000000 0x00040000>;
+				read-only;
+			};
+			partition@40000 {
+				label = "bootloader";
+				/* note this partition overlaps the next three, on purpose
+				   as it can be used for app+linux or for u-boot and kernel, etc. */
+				reg = <0x00040000 0x005C0000>;
+			};
+			partition@80000 {
+				label = "bootenv";
+				reg = <0x00080000 0x00020000>;
+			};
+			partition@a0000 {
+				label = "kernel";
+				reg = <0x000A0000 0x00560000>;
+			};
+			partition@600000 {
+				label = "rootfs";
+				reg = <0x00600000 0x01500000>;
+			};
+			partition@1b00000 {
+				label = "settings";
+				reg = <0x01b00000 0x00100000>;
+			};
+			partition@1c0000 {
+				label = "defaults";
+				reg = <0x01c00000 0x003c0000>;
+			};
+			partition@ifc0000 {
+				label = "NVRAM";
+				reg = <0x01fc0000 0x00040000>;
+			};
+		};
+
+		hrt0@f0004010 {
+			compatible = "csr,quatro-hrt64";
+			reg = <0xf0004010 0x10>;
+		};
+
+		hrt1@f0004020 {
+			compatible = "csr,quatro-hrt32";
+			reg = <0xf0004020 0x0c>;
+		};
+
+		timer0: timer@f000402c {
+			compatible = "csr,quatro-sys-timer";
+			reg = <0xf000402c 0x0c>;
+			interrupts = <0>;
+		};
+
+		restart@f0032044 {
+			compatible = "csr,quatro-rstgenporpowerdown";
+			reg = <0xF0032044 0x4>;
+		};
+
+		rtc: rtc@f0036000 {
+			compatible = "csr,quatro-rtc";
+			reg = <0xf0036000 0x20>;
+			interrupts = <85>;
+		};
+
+		gmac: ethernet@f0018000 {
+			compatible = "csr,quatro-gmac", "snps,dwmac-3.70a";
+			reg = <0xf0018000 0x2000>;
+			interrupts = <100 99>;
+			interrupt-names = "macirq", "eth_wake_irq";  
+			clocks = <&CLK_GMAC_PHY>; 
+			clock-names = "stmmaceth";
+			snps,pbl = <1>;
+//			snps,fixed-burst;
+//			snps,force_sf_dma_mode;
+		};		
+
+		lpri0: lpri@f004a000 {
+			compatible = "csr,quatro-lrds";
+			reg = <0xf004a000 0x2000>;
+			interrupts = <35 38 41 44>;
+		};
+
+		gpdma0: gpdma@f0088000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0xf0088000 0x1000>;
+			interrupts = <87 88>;
+		};
+
+		gpdma1: gpdma@f0043000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0xf0043000 0x1000>;
+			interrupts = <89 90>;
+		};
+
+		jbig0: jbig@f008a000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0xf008a000 0x2000>;
+			interrupts = <20>;
+		};
+
+		jbig1: jbig@f0205000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0xf0205000 0x2000>;
+			interrupts = <21>;
+		};
+
+		scal0: scal@f0210000 {
+			compatible = "csr,quatro-scal";
+			reg = <0xf0210000 0x2000>;
+			interrupts = <27>;
+		};
+
+		scrn0: scrn@f0214000 {
+			compatible = "csr,quatro-scrn";
+			reg = <0xf0214000 0x2000>;
+			interrupts = <28>;
+		};
+
+		fir0: fir@f0216000 {
+			compatible = "csr,quatro-fir";
+			reg = <0xf0216000 0x2000>;
+			interrupts = <26>;
+		};
+
+		huff0: huff@f0218000 {
+			compatible = "csr,quatro-ijac";
+			reg = <0xf0218000 0x1000>;
+			interrupts = <31>;
+		};
+
+		sbe0: sbe@f0220000 {
+			compatible = "csr,quatro-sbe";
+			reg = <0xf0220000 0x10000>;
+			interrupts = <29>;
+		};
+
+		tcc0: tcc@f0240000 {
+			compatible = "csr,quatro-tcc";
+			reg = <0xf0240000 0x20000>;
+			interrupts = <30>;
+		};
+
+		dsp0: dsp@f0300000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xf03f2010 0x4 0xf0300000 0x48000>;
+			interrupts = <22 23>;
+		};
+
+		dsp1: dsp@f0380000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0xf03f2014 0x4 0xf0380000 0x48000>;
+			interrupts = <24 25>;
+		};
+		
+		lcdc: db9k@f0089000 {
+			compatible = "csr,quatro-db9000";
+			reg = <0xf0089000 0x800>,<0xf0089800 0x800>;
+			interrupts = <80>;
+		};
+
+		lcdtp: touch@f0048000 {
+			compatible = "csr,quatro-resistive-touchpanel";
+			reg = <0xf0048000 0x800>,<0xf0048800 0x800>,
+				<0xf004c000 0x4000>,<0xf0070000 0x400>;
+			interrupts = <94>;
+		};
+		sdhci0: sdhci@0xF0007200 {
+			compatible = "csr,quatro53-sdhci";
+			reg = <0xF0007200 0x100>, <0xF0007000 0x100>,
+				<0xF0031028 0x4>, <0xF0031044 0x4>,
+				<0xF0031008 0x4>, <0xF003105C 0x4>,
+				<0xF00331F0 0x4>;
+			interrupts = <81>;
+		};
+		sdhci1: sdhci@0xF0086100 {
+			compatible = "csr,quatro53-sdhci";
+			reg = <0xF0086100 0x100>, <0xF0086000 0x100>,
+				<0xF0031028 0x4>, <0xF0031044 0x4>,
+				<0xF0031008 0x4>, <0xF0031060 0x4>,
+				<0xF00331F8 0x4>;
+			interrupts = <83>;
+		};
+	};
+	
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		/* Reserved memory region for cm3 execution 
+		   Start from 0x0FC00000, size 4MB */
+		cm3_reserved: cm3memory@0FC00000 {
+			compatible = "csr,quatro-cm3";
+			no-map;
+			reg = <0x0FC00000 0x400000>;
+		};
+		barrier_workaround: @0FC00000 {
+		/* We don't need our own memory, just something non-cached 
+		   that we can read. */
+			compatible = "csr,quatro53-barrier-workaround";
+			no-map;
+			reg = <0x0FC00000 0x1000>;
+		};
+	};
+
+	/* cm3 */
+	qm30: qm30@F0050000 {
+		compatible = "csr,quatro-cm3";
+		memory-region = <&cm3_reserved>;
+		reg = 
+			<0xF0050000	0x8000
+			 0x0FC00000	0x3C0000
+			 0xF0050000	0x3000
+			 0xF0054000	0x3000>;
+		interrupts = <64 65 66>;
+	};
+
+	qm31: qm31@F0058000 {
+		compatible = "csr,quatro-cm3";
+		memory-region = <&cm3_reserved>;
+		reg = 
+			<0xF0058000	0x8000
+			 0x0FFC0000	0x40000
+			 0xF0058000	0x3000
+			 0xF005C000	0x3000>;
+		interrupts = <67 68 69>;
+	};		
+};
+
+

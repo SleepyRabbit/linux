@@ -1152,6 +1152,12 @@ config RTC_DRV_PXA
          This RTC driver uses PXA RTC registers available since pxa27x
          series (RDxR, RYxR) instead of legacy RCNR, RTAR.
 
+config RTC_DRV_QUATRO
+	bool "Quatro RTC"
+	depends on SOC_QUATRO4500 || SOC_QUATRO4310 || SOC_QUATRO5300 || SOC_QUATRO5500
+	help
+	  If you say Y here you will get support for the RTC found on Quatro SoC's.
+
 config RTC_DRV_VT8500
 	tristate "VIA/WonderMedia 85xx SoC RTC"
 	depends on ARCH_VT8500

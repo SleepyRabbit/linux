@@ -147,6 +147,14 @@ config USB_EHCI_HCD_OMAP
 	  Enables support for the on-chip EHCI controller on
 	  OMAP3 and later chips.
 
+config USB_EHCI_HCD_QUATRO
+	tristate "EHCI support for Quatro 4xxx and 53xx SOCs"
+	depends on ARCH_QUATRO && (SOC_QUATRO5300 || SOC_QUATRO4500 || SOC_QUATRO4310)
+	default y
+	---help---
+	  Enables support for the on-chip EHCI controller on
+	  Quatro 43xx, 45xx, amd 53xx SOCs.
+
 config USB_EHCI_HCD_ORION
 	tristate  "Support for Marvell EBU on-chip EHCI USB controller"
 	depends on USB_EHCI_HCD && PLAT_ORION

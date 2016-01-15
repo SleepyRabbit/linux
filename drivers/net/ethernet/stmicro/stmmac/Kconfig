@@ -58,6 +58,17 @@ config DWMAC_STI
 	  device driver. This driver is used on for the STi series
 	  SOCs GMAC ethernet controller.
 
+config DWMAC_QUATRO
+	bool "Quatro GMAC support"
+	depends on STMMAC_PLATFORM && (SOC_QUATRO5300 || SOC_QUATRO5500 || SOC_QUATRO4500)
+	default y
+	---help---
+	  Support for GMAC ethernet controller on some Quatro SOCs.
+
+	  This selects Quatro SoC glue layer support for the stmmac
+	  device driver. This driver is used on most CSR Quatro series
+	  SOCs GMAC ethernet controller.
+
 config STMMAC_PCI
 	bool "STMMAC PCI bus support"
 	depends on STMMAC_ETH && PCI

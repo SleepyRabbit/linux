@@ -98,6 +98,12 @@ struct sdhci_host {
 #define SDHCI_QUIRK2_BROKEN_HS200			(1<<6)
 /* Controller does not support DDR50 */
 #define SDHCI_QUIRK2_BROKEN_DDR50			(1<<7)
+/* Controller has bad caps register 2, but really supports some function */
+#define SDHCI_QUIRK2_FORCE_CAPS2				(1<<8)
+/* Controller enables 1.8v signal by another way */
+#define SDHCI_QUIRK2_ENABLE_1_8V_ALTERNATIVE	(1<<9)
+/* Controller is capable of switching voltage even if version < 3.00 */
+#define SDHCI_QUIRK2_CAPABLE_OF_VOLTAGE_SWITCH	(1<<10)
 
 	int irq;		/* Device IRQ */
 	void __iomem *ioaddr;	/* Mapped address */

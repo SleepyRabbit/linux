@@ -1714,13 +1714,21 @@ static int sdhci_do_start_signal_voltage_switch(struct sdhci_host *host,
 	 * Signal Voltage Switching is only applicable for Host Controllers
 	 * v3.00 and above.
 	 */
-	if (host->version < SDHCI_SPEC_300)
+	if ((host->version < SDHCI_SPEC_300)
+		& !(host->quirks2 & SDHCI_QUIRK2_CAPABLE_OF_VOLTAGE_SWITCH))
 		return 0;
 
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 
 	switch (ios->signal_voltage) {
 	case MMC_SIGNAL_VOLTAGE_330:
+		if (host->quirks2 & SDHCI_QUIRK2_ENABLE_1_8V_ALTERNATIVE) {
+			host->ops->enable_1_8v_signal(host, 0);
+			/* Wait for 5ms */
+			usleep_range(5000, 5500);
+			return 0;
+		}
+
 		/* Set 1.8V Signal Enable in the Host Control2 register to 0 */
 		ctrl &= ~SDHCI_CTRL_VDD_180;
 		sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
@@ -1746,6 +1754,12 @@ static int sdhci_do_start_signal_voltage_switch(struct sdhci_host *host,
 
 		return -EAGAIN;
 	case MMC_SIGNAL_VOLTAGE_180:
+		if (host->quirks2 & SDHCI_QUIRK2_ENABLE_1_8V_ALTERNATIVE) {
+			host->ops->enable_1_8v_signal(host, 1);
+			/* Wait for 5ms */
+			usleep_range(5000, 5500);
+			return 0;
+		}
 		if (host->vqmmc) {
 			ret = regulator_set_voltage(host->vqmmc,
 					1700000, 1950000);
@@ -1797,7 +1811,8 @@ static int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 	struct sdhci_host *host = mmc_priv(mmc);
 	int err;
 
-	if (host->version < SDHCI_SPEC_300)
+	if ((host->version < SDHCI_SPEC_300)
+		& !(host->quirks2 & SDHCI_QUIRK2_CAPABLE_OF_VOLTAGE_SWITCH))
 		return 0;
 	sdhci_runtime_pm_get(host);
 	err = sdhci_do_start_signal_voltage_switch(host, ios);
@@ -1841,10 +1856,13 @@ static int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	case MMC_TIMING_UHS_SDR104:
 		break;
 
+	// disable tuning function since it's broken for now
+	/*
 	case MMC_TIMING_UHS_SDR50:
 		if (host->flags & SDHCI_SDR50_NEEDS_TUNING ||
 		    host->flags & SDHCI_SDR104_NEEDS_TUNING)
 			break;
+	*/
 		/* FALLTHROUGH */
 
 	default:
@@ -2778,6 +2796,9 @@ int sdhci_add_host(struct sdhci_host *host)
 		caps[1] = (host->quirks & SDHCI_QUIRK_MISSING_CAPS) ?
 			host->caps1 :
 			sdhci_readl(host, SDHCI_CAPABILITIES_1);
+
+	if (host->quirks2 & SDHCI_QUIRK2_FORCE_CAPS2)
+		caps[1] = host->caps1;
 
 	if (host->quirks & SDHCI_QUIRK_FORCE_DMA)
 		host->flags |= SDHCI_USE_SDMA;

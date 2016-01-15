@@ -1,0 +1,568 @@
+/*
+ * DTS file for CSR Quatro 5500 SMP
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/include/ "skeleton.dtsi"
+/ {
+	compatible = "csr,quatro-5500";
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	aliases {
+		serial0	= &uart0;
+	};
+
+	clusters {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cluster0: cluster@0 {
+			reg = <0>;
+			cores {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				core0: core@0 {
+					reg = <0>;
+				};
+			};
+		};
+
+		cluster1: cluster@1 {
+			reg = <1>;
+			cores {
+				#address-cells = <1>;
+				#size-cells = <0>;
+
+				core1: core@100 {
+					reg = <0>;
+				};
+				core2: core@101 {
+					reg = <1>;
+				};
+			};
+		};
+	};
+
+	cpus {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		cpu@0 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a7";
+			reg = <0x000>;
+			cci-control-port = <&cci_control3>;
+			cluster = <&cluster0>;
+			core = <&core0>;
+			clock-frequency = <666000000>;
+		};
+
+		cpu@100 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a15";
+			reg = <0x100>;
+			cci-control-port = <&cci_control4>;
+			cluster = <&cluster1>;
+			core = <&core1>;
+			clock-frequency = <1000000000>;
+		};
+
+		cpu@101 {
+			device_type = "cpu";
+			compatible = "arm,cortex-a15";
+			reg = <0x101>;
+			cci-control-port = <&cci_control4>;
+			cluster = <&cluster1>;
+			core = <&core2>;
+			clock-frequency = <1000000000>;
+		};
+	};
+
+	cci@04060000 {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "arm,cci-400";
+		reg = <0 0x04060000 0 0x1000>;
+		ranges;
+
+		cci_control0: slave-if@1000 {
+			compatible = "arm,cci-400-ctrl-if";
+			interface-type = "ace-lite";
+			reg = <0 0x04061000 0 0x1000>;
+		};
+
+		cci_control1: slave-if@2000 {
+			compatible = "arm,cci-400-ctrl-if";
+			interface-type = "ace-lite";
+			reg = <0 0x04062000 0 0x1000>;
+		};
+
+		cci_control2: slave-if@3000 {
+			compatible = "arm,cci-400-ctrl-if";
+			interface-type = "ace-lite";
+			reg = <0 0x04063000 0 0x1000>;
+		};
+
+		cci_control3: slave-if@4000 {
+			compatible = "arm,cci-400-ctrl-if";
+			interface-type = "ace";
+			reg = <0 0x04064000 0 0x1000>;
+		};
+
+		cci_control4: slave-if@5000 {
+			compatible = "arm,cci-400-ctrl-if";
+			interface-type = "ace";
+			reg = <0 0x04065000 0 0x1000>;
+		};
+
+		//pmu@9000 {
+		//	compatible = "arm,cci-400-pmu";
+		//	reg = <0 0x04069000 0 0x5000>;
+		//	interrupts = <GIC_SPI 69 IRQ_TYPE_LEVEL_HIGH>,
+		//		     <GIC_SPI 70 IRQ_TYPE_LEVEL_HIGH>,
+		//		     <GIC_SPI 71 IRQ_TYPE_LEVEL_HIGH>,
+		//		     <GIC_SPI 72 IRQ_TYPE_LEVEL_HIGH>,
+		//		     <GIC_SPI 73 IRQ_TYPE_LEVEL_HIGH>;
+		//};
+	};
+
+	sram: sram@05400000 {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		compatible = "mmio-sram";
+		reg = <0 0x05400000 0 0x100000>;
+		ranges;
+
+		smp-sram@0 {
+			compatible = "csr,quatro55xx-smp-sram";
+			reg = <0 0x05400000 0 0x8>;
+		};
+		/* TODO: Add other spad entries here. */
+	};
+
+	clocks {
+		/*
+		 * Fixed 24MHz oscillator input to SoC
+		 */
+		CLK_OSCIN: CLK_OSCIN {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <24000000>;
+		};
+
+		CLK_SYS: CLK_SYS {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <285000000>;
+			clock-output-names = "CLK_SYS";
+		};
+
+		CLK_MFP: CLK_MFP {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <285000000>;
+			clock-output-names = "CLK_MFP2";
+		};
+
+		sata_ref_clk: sata_ref_clk {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <100000000>;
+			clock-output-names = "sata_ref_clk";
+		};
+
+	};
+
+	gic: interrupt-controller@04301000 {
+		compatible = "arm,cortex-a15-gic";
+		#interrupt-cells = <3>;
+		interrupt-controller;
+		reg = <0 0x04301000 0 0x1000>,
+		      <0 0x04302000 0 0x2000>,
+		      <0 0x04304000 0 0x2000>,
+		      <0 0x04306000 0 0x2000>;
+		interrupts = <1 9 0xf04>;
+	};
+
+	regbus {
+		compatible = "simple-bus";
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		uart0: serial@040B0010 {
+			compatible = "ns16550a";
+			reg = <0 0x040B0010 0 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <0 18 4>;
+			current-speed = <115200>;
+			clocks = <&CLK_SYS>;
+			no-loopback-test;
+		};
+
+		uart1: serial@04160010 {
+			compatible = "ns16550a";
+			reg = <0 0x04160010 0 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <0 29 4>;
+			current-speed = <115200>;
+			clocks = <&CLK_SYS>;
+			no-loopback-test;
+		};		
+
+		uart2: serial@052C0010 {
+			compatible = "ns16550a";
+			reg = <0 0x052C0010 0 0x10>;
+			reg-shift = <0>;
+			reg-io-width = <1>;
+			interrupts = <0 137 4>;
+			current-speed = <115200>;
+			clocks = <&CLK_MFP>;
+			no-loopback-test;
+		};
+
+		//uart3: serial@052D0010 {
+		//	compatible = "ns16550a";
+		//	reg = <0 0x052D0010 0 0x10>;
+		//	reg-shift = <0>;
+		//	reg-io-width = <1>;
+		//	interrupts = <0 138 4>;
+		//	current-speed = <115200>;
+		//	clocks = <&CLK_MFP>;
+		//	no-loopback-test;
+		//};
+
+		//uart4: serial@052e0010 {
+		//	compatible = "ns16550a";
+		//	reg = <0 0x052e0010 0 0x10>;
+		//	reg-shift = <0>;
+		//	reg-io-width = <1>;
+		//	interrupts = <0 184 4>;
+		//	current-speed = <115200>;
+		//	clocks = <&CLK_MFP>;
+		//	no-loopback-test;
+		//};
+
+		//uart5: serial@052f0010 {
+		//	compatible = "ns16550a";
+		//	reg = <0 0x052f0010 0 0x10>;
+		//	reg-shift = <0>;
+		//	reg-io-width = <1>;
+		//	interrupts = <0 185 4>;
+		//	current-speed = <115200>;
+		//	clocks = <&CLK_MFP>;
+		//	no-loopback-test;
+		//};
+		
+		//uart_modem: serial@04170010 {
+		//	compatible = "ns16550a";
+		//	reg = <0 0x04170010 0 0x10>;
+		//	reg-shift = <0>;
+		//	reg-io-width = <1>;
+		//	interrupts = <0 31 4>;
+		//	current-speed = <115200>;
+		//	clocks = <&CLK_MFP>;
+		//	no-loopback-test;
+		//};
+
+		hrt0@04040010 {
+			compatible = "csr,quatro-hrt64";
+			reg = <0 0x04040010 0 0x10>;
+		};
+		
+		//hrt1@04040020 {
+		//	compatible = "csr,quatro-hrt32";
+		//	reg = <0 0x04040020 0 0x0c>;
+		//};
+		
+		//timer0: timer@0404002c {
+		//	compatible = "csr,quatro-sys-timer";
+		//	reg = <0 0x0404002c 0 0x40>;
+		//	interrupts =
+		//		<0 4 1>,
+		//		<0 5 1>,
+		//		<0 6 1>,
+		//		<0 7 1>;
+		//};
+
+		timer {
+			compatible = "arm,armv7-timer";
+			interrupts = 
+				<1 13 0xf04>,
+				<1 14 0xf04>,
+				<1 11 0xf04>,
+				<1 10 0xf04>;
+			clock-frequency = <24000000>;
+		};
+
+		restart@04010044 {
+			compatible = "csr,quatro-rstgenporpowerdown";
+			reg = <0 0x04010044 0 0x4>;
+		};
+
+		rtc: rtc@04030000 {
+			compatible = "csr,quatro-rtc";
+			reg = <0 0x04030000 0 0x20>;
+			interrupts = <0 2 1>;
+		};
+
+		gmac: ethernet@04410000 {
+			compatible = "csr,quatro-gmac", "snps,dwmac-3.70a";
+			reg = <0 0x04410000 0 0x9000>;
+			interrupts = <0 94 4>, <0 93 4>;
+			interrupt-names = "macirq", "eth_wake_irq";
+			dma-coherent;
+			clocks = <&CLK_SYS>;
+			clock-names = "stmmaceth";
+			phy-mode = "rgmii";
+			snps,pbl = <1>;
+		};		
+                
+		sata: sata@04A30000 {
+			compatible = "snps,dwc-ahci";
+			reg = <0 0x04A30000 0 0x144>;
+			interrupts = <0 53 4>, <0 54 4>;
+			interrupt-names = "sata_irq", "sata_err_irq";
+			clocks = <&sata_ref_clk>;
+		};
+
+		lpri0: lpri@05120000 {
+			compatible = "csr,quatro-lrds";
+			reg = <0 0x05120000 0 0xE0000>;
+			interrupts = <0 160 1>,<0 166 1>,<0 172 1>,<0 178 1>;
+		};
+
+		gpdma0: gpdma@04150000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0 0x04150000 0 0x20>;
+			interrupts = <0 27 4>,<0 28 4>;
+		};
+
+		gpdma1: gpdma@04940000 {
+			compatible = "csr,quatro-gpdma";
+			reg = <0 0x04940000 0 0x20>;
+			interrupts = <0 44 4>,<0 45 4>;
+		};
+
+		jbig0: jbig@05110000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0 0x05110000 0 0x2000>;
+			interrupts = <0 156 4>;
+		};
+
+		jbig1: jbig@05150000 {
+			compatible = "csr,quatro-jbig";
+			reg = <0 0x05150000 0 0x2000>;
+			interrupts = <0 157 4>;
+		};
+
+		fir0: fir@05060000 {
+			compatible = "csr,quatro-fir";
+			reg = <0 0x05060000 0 0x2000>;
+			interrupts = <0 81 4>;
+		};
+
+		fir1: fir@05070000 {
+			compatible = "csr,quatro-fir";
+			reg = <0 0x05070000 0 0x2000>;
+			interrupts = <0 82 4>;
+		};
+
+		scal0: scal@05080000 {
+			compatible = "csr,quatro-scal";
+			reg = <0 0x05080000 0 0x2000>;
+			interrupts = <0 83 4>;
+		};
+
+		scal1: scal@05090000 {
+			compatible = "csr,quatro-scal";
+			reg = <0 0x05090000 0 0x2000>;
+			interrupts = <0 84 4>;
+		};
+
+		scrn0: scrn@050a0000 {
+			compatible = "csr,quatro-scrn";
+			reg = <0 0x050a0000 0 0x2000>;
+			interrupts = <0 85 4>;
+		};
+
+		scrn1: scrn@050b0000 {
+			compatible = "csr,quatro-scrn";
+			reg = <0 0x050b0000 0 0x2000>;
+			interrupts = <0 86 4>;
+		};
+
+		sbe0: sbe@05040000 {
+			compatible = "csr,quatro-sbe";
+			reg = <0 0x05040000 0 0x10000>;
+			interrupts = <0 79 4>;
+		};
+
+		sbe1: sbe@05050000 {
+			compatible = "csr,quatro-sbe";
+			reg = <0 0x05050000 0 0x10000>;
+			interrupts = <0 80 4>;
+		};
+
+		tcc0: tcc@04980000 {
+			compatible = "csr,quatro-tcc";
+			reg = <0 0x04980000 0 0x20000>;
+			interrupts = <0 48 4>;
+		};
+
+		tcc1: tcc@049a0000 {
+			compatible = "csr,quatro-tcc";
+			reg = <0 0x049a0000 0 0x20000>;
+			interrupts = <0 49 4>;
+		};
+
+		dsp0: dsp@05700000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0 0x057f2018 0 0x4 0 0x05700000 0 0x48000>;
+			interrupts = <0 67 4>,<0 68 1>;
+		};
+
+		dsp1: dsp@05780000 {
+			compatible = "csr,quatro-dsp";
+			reg = <0 0x057f201c 0 0x4 0 0x05780000 0 0x48000>;
+			interrupts = <0 69 4>,<0 70 1>;
+		};
+
+		lcdc: db9k@052a0000 {
+			compatible = "csr,quatro-db9000";
+			reg = <0 0x052a0000 0 0x1000>,<0 0x052A1000 0 0x100>;
+			interrupts = <0 187 4>;
+		};
+
+		lcdtp: touch@053c0000 {
+			compatible = "csr,quatro-resistive-touchpanel";
+			reg = <0 0x053c0000 0 0x800>,<0 0x053c0800 0 0x800>,
+				<0 0x05320000 0 0x4000>,<0 0x05330000 0 0x400>;
+			interrupts = <0 105 4>;
+		};
+
+		usbd: usbd@04500000 {
+			compatible = "csr,quatro-usbd";
+			reg = <0 0x04500000 0 0x100000>;
+			interrupts = <0 61 4>;
+			tx-fifo-resize;
+		};
+
+		usbh: usbh@04600000 {
+			compatible = "generic-xhci";
+			reg = <0 0x04600000 0 0x100000>;
+			interrupts = <0 97 4>;
+		};
+
+		sdhci0: sdhci@04440100 {
+			compatible = "csr,quatro-sdhci";
+			reg = <0 0x04440100 0 0x100>, <0 0x04440000 0 0x100>,
+					<0 0x040501D8 0 0x8>, <0 0x04020430 0 0x4>,
+					<0 0x04020458 0 0x4>, <0 0x04050280 0 0x4>;
+			interrupts = <0 99 4>;
+		};
+
+		sdhci1: sdhci@04450100 {
+			compatible = "csr,quatro-sdhci";
+			reg = <0 0x04450100 0 0x100>, <0 0x04450000 0 0x100>,
+					<0 0x040501D8 0 0x8>, <0 0x04020430 0 0x4>,
+					<0 0x0402045C 0 0x4>, <0 0x04050284 0 0x4>;
+			interrupts = <0 101 4>;
+		};
+
+		sdhci2: sdhci@04450200 {
+			compatible = "csr,quatro-sdhci";
+			reg = <0 0x04450200 0 0x100>, <0 0x04450000 0 0x100>,
+					<0 0x040501D8 0 0x8>, <0 0x04020430 0 0x4>,
+					<0 0x0402045C 0 0x4>, <0 0x04050284 0 0x4>;
+			interrupts = <0 101 4>;
+		};
+
+		
+
+		scan0: scan@05200000 {
+			compatible = "csr,quatro-scan";
+			reg = <0 0x05200000 0 0xe100>;
+			interrupts = <0 127 1>;
+		};
+
+		scan1: scan@05240000 {
+			compatible = "csr,quatro-scan";
+			reg = <0 0x05240000 0 0xe100>;
+			interrupts = <0 132 1>;
+		};
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/* Reserved memory region for cm3 execution 
+		   Start from 0x0FC00000, size 4MB */
+		cm3_reserved: cm3memory@8FC00000 {
+			compatible = "csr,quatro-cm3";
+			no-map;
+			reg = <0 0x8FC00000 0 0x1400000>;
+		};
+	};
+
+	/* cm3 */
+	qm30: qm30@05340000 {
+		compatible = "csr,quatro-cm3";
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		memory-region = <&cm3_reserved>;
+		reg = 
+			<0 0x05340000 0 0x8000
+			 0 0x8FC00000 0 0x3C0000
+			 0 0x05340000 0 0x3000
+			 0 0x05344000 0 0x3000>;
+		interrupts =
+			<0 114 4>,
+			<0 115 4>,
+			<0 116 4>;
+	};
+
+	qm31: qm31@05360000 {
+		compatible = "csr,quatro-cm3";
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		memory-region = <&cm3_reserved>;
+		reg = 
+			<0 0x05360000 0 0x8000
+			 0 0x8FFC0000 0 0x40000
+			 0 0x05360000 0 0x3000
+			 0 0x05364000 0 0x3000>;
+		interrupts =
+			<0 117 4>,
+			<0 118 4>,
+			<0 119 4>;
+	};
+
+	jpeg0: jpeg@04960000 {
+		compatible = "csr,quatro-jpeg";
+		memory-region = <&cm3_reserved>;
+		reg = <0 0x04960000 0 0x8000
+		0 0x90000000 0 0x1000000>;
+		interrupts = <0 47 4>;
+	};	
+};

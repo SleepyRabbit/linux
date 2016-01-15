@@ -1,0 +1,16 @@
+Quatro Restart Driver
+
+The power down input to the internal POR cell is asserted, thereby powering 
+down the POR cell, if the value in this register is 0x86753099. The power down 
+input is deasserted, thereby powering up the POR cell, for all other values.
+
+Required Properties:
+-compatible: "csr,quatro-rstgenporpowerdown"
+-reg: Specifies the physical address of the rstgenporpowerdown register
+
+Example:
+
+	restart@f0032044 {
+		compatible = "csr,quatro-rstgenporpowerdown";
+		reg = <0xF0032044 0x4>;
+	};

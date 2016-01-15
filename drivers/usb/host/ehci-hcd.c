@@ -1295,6 +1295,11 @@ MODULE_LICENSE ("GPL");
 #define        PLATFORM_DRIVER         ehci_mv_driver
 #endif
 
+#if defined CONFIG_USB_EHCI_HCD_QUATRO
+#include "ehci-quatro.c"
+#define	PLATFORM_DRIVER		ehci_quatro_driver_ops
+#endif
+
 #ifdef CONFIG_MIPS_SEAD3
 #include "ehci-sead3.c"
 #define	PLATFORM_DRIVER		ehci_hcd_sead3_driver

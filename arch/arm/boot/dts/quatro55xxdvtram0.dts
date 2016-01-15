@@ -1,0 +1,84 @@
+#include <dt-bindings/interrupt-controller/irq.h>
+/*
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/dts-v1/;
+
+/include/ "quatro5500.dtsi"
+
+/ {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	model = "CSR Quatro 5500 Evaluation Board";
+	compatible = "csr,quatro-5500";
+
+	chosen {
+	       bootargs = "root=/dev/ram0      rw rootwait console=ttyS0,115200n8 earlyprintk=serial,uart0,115200"; 
+	};
+	memory {
+	/* has 4GB, 2GB of ram at 0x0 8000 0000 and 2GB at 0x8 0000 0000
+	*/
+		reg = <0 0x80000000 0 0x80000000 8 0x00000000 0 0x80000000 >;
+	};	
+	/* spi flash 
+	*/
+	//
+	fcspi@041100000 {
+			compatible = "csr,fcspi";
+			linux,mtd-name = "physmap-flash.0";
+			reg = <0 0x04110000 0 0x1000>;
+			interrupts = <0 21 4>;
+			paeshift = <4>;
+			#address-cells = <1>;
+			#size-cells = <1>;
+
+		partition@0 {
+			label = "boot";
+			reg = <0x00000000 0x00040000>;
+			read-only;
+		};
+		partition@40000 {
+			label = "bootloader";
+			// note this partition overlaps the next three, on purpose
+			// as it can be used for app+linux or for u-boot and kernel, etc.
+			reg = <0x00040000 0x005C0000>;
+		};
+		partition@80000 {
+			label = "bootenv";
+			reg = <0x00080000 0x00020000>;
+		};
+		partition@a0000 {
+			label = "kernel";
+			reg = <0x000A0000 0x00560000>;
+		};
+		partition@600000 {
+			label = "rootfs";
+			reg = <0x00600000 0x01500000>;
+		};
+		partition@1b00000 {
+			label = "settings";
+			reg = <0x01b00000 0x00100000>;
+		};
+		partition@1c0000 {
+			label = "defaults";
+			reg = <0x01c00000 0x003c0000>;
+		};
+		partition@ifc0000 {
+			label = "NVRAM";
+			reg = <0x01fc0000 0x00040000>;
+		};
+	};
+
+	//
+};

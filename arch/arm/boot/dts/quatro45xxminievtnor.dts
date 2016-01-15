@@ -1,0 +1,81 @@
+/*
+ * DTS file for CSR 4500 Min-Evt NOR-Flash Evaluation Board
+ *
+ * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ */
+
+/dts-v1/;
+
+/include/ "quatro4500.dtsi"
+
+/ {
+	model = "CSR Quatro 4500 Mini-EVT NOR Evaluation Board";
+	compatible = "csr,quatro-4500";
+
+	chosen {
+	       bootargs = "root=/dev/mtdblock4 console=ttyS0,115200n8";
+/*	       bootargs = "root=/dev/mtdblock4 console=ttyS0,115200n8 earlyprintk=serial,uart0,115200"; */
+	};
+	/* has 512Mb of ram at 0
+	*/
+	memory {
+		reg = <0x00000000 0x20000000>;
+	};	
+	/* nor flash 
+	*/
+	nor@f8000000 {
+		compatible = "cfi-flash";
+		reg = <0xf8000000 0x02000000>;
+		bank-width = <1>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		linux,mtd-name = "physmap-flash.0";
+
+		partition@0 {
+			label = "boot";
+			reg = <0x00000000 0x00040000>;
+			read-only;
+		};
+		partition@40000 {
+			label = "bootloader";
+			// note this partition overlaps the next three, on purpose
+			//   as it can be used for app+linux or for u-boot and kernel, etc.
+			reg = <0x00040000 0x005C0000>;
+		};
+		partition@80000 {
+			label = "bootenv";
+			reg = <0x00080000 0x00020000>;
+		};
+		partition@a0000 {
+			label = "kernel";
+			reg = <0x000A0000 0x00560000>;
+		};
+		partition@600000 {
+			label = "rootfs";
+			reg = <0x00600000 0x01500000>;
+		};
+		partition@1b00000 {
+			label = "settings";
+			reg = <0x01b00000 0x00100000>;
+		};
+		partition@1c0000 {
+			label = "defaults";
+			reg = <0x01c00000 0x003c0000>;
+		};
+		partition@ifc0000 {
+			label = "NVRAM";
+			reg = <0x01fc0000 0x00040000>;
+		};
+	};
+};
+

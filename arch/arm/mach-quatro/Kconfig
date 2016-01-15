@@ -1,0 +1,67 @@
+config ARCH_QUATRO
+	bool "CSR Quatro (4310, 4500, 5300) support" if ARCH_MULTI_V4_V5 || ARCH_MULTI_V6_V7
+	help
+	  Support for CSR Quatro family of processors
+
+menu "CSR Quatro support"
+	depends on ARCH_QUATRO
+
+config SOC_QUATRO5500
+	bool "CSR Quatro 5500 bigLittle SMP Platform"
+	select CPU_V7
+	select HAVE_SMP
+	select ARM_GIC
+	select DWMAC_QUATRO 
+	select CLKSRC_MMIO
+	select USB_XHCI_PLATFORM
+	select ARCH_DMA_ADDR_T_64BIT if ARM_LPAE
+	help
+          Support for CSR Quatro 5500 Platform
+
+config SOC_QUATRO5300
+	bool "CSR Quatro 5300 ARM11MPCore Platform"
+	select CPU_V6K
+	select GENERIC_IRQ_CHIP
+	select QUATRO_IRQ
+	select DWMAC_QUATRO 
+	select CLKSRC_MMIO
+	help
+          Support for CSR Quatro 5300 ARM11MPCore Platform
+
+config SOC_QUATRO4500
+	bool "CSR Quatro 4500 ARM11MPCore (SMP) Platform"
+	select CPU_V6K
+	select HAVE_SMP
+	select HAVE_ARM_SCU if SMP
+	select GENERIC_IRQ_CHIP
+	select QUATRO_IRQ
+	select DWMAC_QUATRO 
+	select CLKSRC_MMIO
+	help
+          Support for CSR Quatro 4500 ARM11MPCore Platform
+
+config SOC_QUATRO4310
+	bool "CSR Quatro 4310 ARM926T Platform"
+	select CPU_ARM926T
+	select GENERIC_IRQ_CHIP
+	select QUATRO_IRQ
+	select CLKSRC_MMIO
+	help
+          Support for CSR Quatro 4310 ARM926T Platform
+
+endmenu
+
+config QUATRO5500_A15_DIV2
+       bool "Change the Quatro 5500 clock divider on the A15 path to RAM from 3 to 2."
+       default n
+       depends on SOC_QUATRO5500
+
+config QUATRO_WIRELESS
+    bool "Quatro Wireless support"
+    select WIRELESS_EXT
+    select WEXT_PRIV
+    default n
+    help
+      Select this option if you want to directly enable Wireless 
+      Extensions for a Quatro kernel without having to enable
+      any specific Wi-Fi driver.

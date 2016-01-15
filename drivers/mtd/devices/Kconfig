@@ -95,6 +95,12 @@ config MTD_M25P80
 	  if you want to specify device partitioning or to use a device which
 	  doesn't support the JEDEC ID instruction.
 
+config MTD_FCSPI
+	bool "Support SPI Flash attached to a Quatro flash controller"
+	depends on (ARCH_QUATRO && (SOC_QUATRO5300 || SOC_QUATRO5500))
+	help
+	  This enables the SPI-MEM_CTRL on Quatro SOCs to access SPI flash chips.
+
 config MTD_SPEAR_SMI
 	tristate "SPEAR MTD NOR Support through SMI controller"
 	depends on PLAT_SPEAR

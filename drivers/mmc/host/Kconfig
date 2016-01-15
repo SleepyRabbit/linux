@@ -721,3 +721,20 @@ config MMC_SUNXI
 	help
 	  This selects support for the SD/MMC Host Controller on
 	  Allwinner sunxi SoCs.
+
+config MMC_SDHCI_QUATRO
+	tristate "SDHCI support on Quatro SoC"
+	depends on MMC_SDHCI
+	default y
+	help
+	  If you say yes here you will get support for SDHCI
+	  on Quatro55 family of SOCs
+
+config MMC_SDHCI_QUATRO53
+	tristate "SDHCI support on Quatro53 SoC"
+	depends on MMC_SDHCI
+	default y
+	help
+	  If you say yes here you will get support for SDHCI
+	  on Quatro53 family of SOCs
+
