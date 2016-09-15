@@ -184,6 +184,11 @@
 			};
 		};
 
+		l2cache@f00a4000 {
+			compatible = "csr,quatro-l2cache";
+	 		reg = <0xf00a4000 0x1000>;
+		};	
+
 		hrt0@f0004010 {
 			compatible = "csr,quatro-hrt64";
 			reg = <0xf0004010 0x10>;

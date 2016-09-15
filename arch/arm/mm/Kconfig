@@ -947,6 +947,14 @@ config PL310_ERRATA_769419
 
 endif
 
+config CACHE_L2QUATRO
+	bool "Enable the L2 outer cache controller"
+	select OUTER_CACHE
+	default y
+	depends on SOC_QUATRO5300
+	help
+	  This option enables the Quatro 53XX L2 cache.
+
 config CACHE_TAUROS2
 	bool "Enable the Tauros2 L2 cache controller"
 	depends on (ARCH_DOVE || ARCH_MMP || CPU_PJ4)

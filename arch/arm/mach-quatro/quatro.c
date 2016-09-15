@@ -1,7 +1,7 @@
 /*
  * arch/arm/mach-quatro/quatro.c
  *
- * Copyright (c) 2014, 2015 Linux Foundation.
+ * Copyright (c) 2014 - 2016 Linux Foundation.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -24,8 +24,10 @@
 #include <linux/of_platform.h>
 #include <asm/mcpm.h>
 #include "quatro.h"
-
 #include <asm/mach/map.h>
+#ifdef CONFIG_SOC_QUATRO5300
+#include <asm/hardware/cache-l2quatro.h>
+#endif
 
 #define QUATRO_DDRMEMCTRL                0x04314800
 #define QUATRO_EXTENDED_ADDRESS_MODE_OFF 0x00000080
@@ -81,7 +83,6 @@ static void __init quatro_init_machine(void)
 {
 #ifdef CONFIG_SOC_QUATRO5300
 	struct device_node *node;
-	int ret;
 
 	node = of_find_compatible_node(NULL, NULL, "csr,quatro53-barrier-workaround");
 	if (!node) {
@@ -89,6 +90,12 @@ static void __init quatro_init_machine(void)
 		return;
 	}
 	barrier_workaround_addr_g = (unsigned long*)of_iomap(node, 0);
+#ifdef CONFIG_CACHE_L2QUATRO
+	if (l2quatro_of_init() != 0) {
+		pr_err("%s: could not find or map quatro-l2cache in devicetree node\n", __func__);
+		return;
+	}
+#endif
 #endif
 
 	of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
