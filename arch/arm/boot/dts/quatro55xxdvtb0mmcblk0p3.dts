@@ -2,7 +2,7 @@
 /*
  * DTS file for CSR 5500 DVT Evaluation Board
  *
- * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,7 +17,7 @@
 
 /dts-v1/;
 
-/include/ "quatro5500.dtsi"
+/include/ "quatro5500b0.dtsi"
 
 / {
 	#address-cells = <2>;

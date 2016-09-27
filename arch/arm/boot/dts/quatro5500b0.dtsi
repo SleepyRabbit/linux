@@ -1,7 +1,7 @@
 /*
  * DTS file for CSR Quatro 5500 SMP
  *
- * Copyright (c) 2014, 2015, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2014-2016, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -277,7 +277,7 @@
 		//	reg-io-width = <1>;
 		//	interrupts = <0 31 4>;
 		//	current-speed = <115200>;
-		//	clocks = <&CLK_MFP>;
+		//	clocks = <&CLK_SYS>;
 		//	no-loopback-test;
 		//};
 
@@ -448,13 +448,6 @@
 			compatible = "csr,quatro-db9000";
 			reg = <0 0x052a0000 0 0x1000>,<0 0x052A1000 0 0x100>;
 			interrupts = <0 187 4>;
-		};
-
-		lcdtp: touch@053c0000 {
-			compatible = "csr,quatro-resistive-touchpanel";
-			reg = <0 0x053c0000 0 0x800>,<0 0x053c0800 0 0x800>,
-				<0 0x05320000 0 0x4000>,<0 0x05330000 0 0x400>;
-			interrupts = <0 105 4>;
 		};
 
 		usbd: usbd@04500000 {

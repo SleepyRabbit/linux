@@ -312,12 +312,18 @@ dtb-$(CONFIG_ARCH_ORION5X) += orion5x-lacie-d2-network.dtb \
 	orion5x-maxtor-shared-storage-2.dtb \
 	orion5x-rd88f5182-nas.dtb
 dtb-$(CONFIG_ARCH_PRIMA2) += prima2-evb.dtb
-dtb-$(CONFIG_SOC_QUATRO5500) += quatro55xxdvt.dtb	\
-	quatro55xxdvt-2gbyte.dtb	\
-	quatro55xxdvtmmcblk0p3.dtb	\
-	quatro55xxdvtmmcblk0p3-2gbyte.dtb	\
-	quatro55xxdvtram0.dtb	\
-	quatro55xxdvtram0-2gbyte.dtb
+dtb-$(CONFIG_SOC_QUATRO5500) += quatro55xxdvtb0.dtb	\
+	quatro55xxdvtc0.dtb	\
+	quatro55xxdvtb0-2gbyte.dtb	\
+	quatro55xxdvtc0-2gbyte.dtb	\
+	quatro55xxdvtb0mmcblk0p3.dtb	\
+	quatro55xxdvtc0mmcblk0p3.dtb	\
+	quatro55xxdvtb0mmcblk0p3-2gbyte.dtb	\
+	quatro55xxdvtc0mmcblk0p3-2gbyte.dtb	\
+	quatro55xxdvtb0ram0.dtb	\
+	quatro55xxdvtc0ram0.dtb	\
+	quatro55xxdvtb0ram0-2gbyte.dtb	\
+	quatro55xxdvtc0ram0-2gbyte.dtb
 dtb-$(CONFIG_SOC_QUATRO5300) += quatro53xxdvt.dtb \
 	quatro53xxrdk.dtb
 dtb-$(CONFIG_SOC_QUATRO4500) += quatro45xxminievtnor.dtb
